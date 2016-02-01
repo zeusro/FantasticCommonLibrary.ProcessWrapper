@@ -5,10 +5,13 @@
     "description": "cmd 的封装,支持.net 4.0,net4.5以及多命令的同时多线程进行.并且在运行效率方便,运用了线程同步,确保命令执行完才会退出",
     "authors": [ "Zeusro" ],
     "owners": [ "Zeusro" ],
+    "language": "C#",
+    "summary": "我好帅呀~",
     "tags": [ "Process", "" ],
     "copyright": "Copyright 2016",
     "projectUrl": "https://github.com/zeusro/FantasticCommonLibrary.ProcessWrapper",
     "licenseUrl": "https://raw.githubusercontent.com/zeusro/FantasticCommonLibrary.ProcessWrapper/master/LICENSE",
+    "iconUrl": "http://zeusro.github.io/image/7F55041ECCDC6D8D2DA97A1E9115B2B5_B500_900_500_600.JPEG",
     "frameworks": {
         "net40": {
             "dependencies": {

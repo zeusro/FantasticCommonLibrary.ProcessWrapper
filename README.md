@@ -3,6 +3,7 @@ cmd 的封装,支持.net 4.0,net4.5以及多命令的同时多线程进行.并�
 
 # Usage
 
+```
             using FantasticCommonLibrary.ProcessWrapper;
             "tasklist".RunSingleCommand();
             string[] commands = new string[]
@@ -12,3 +13,10 @@ cmd 的封装,支持.net 4.0,net4.5以及多命令的同时多线程进行.并�
                 "qprocess",
             };
             commands.RunMultiCommand(false);
+```
+
+#Nuget
+
+```
+Install-Package FantasticCommonLibrary.ProcessWrapper
+```

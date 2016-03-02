@@ -89,6 +89,90 @@ namespace FantasticCommonLibrary.ProcessWrapper
         }
 
 
+        /// <summary>
+        /// 执行单条命令
+        /// </summary>
+        /// <param name="commands">命令</param>
+        /// <param name="isOutput">是否输出</param>
+        public static void RunSingleCommand(this IEnumerable<string> commands, bool isOutput = true)
+        {
+            AutoResetEvent auto = new AutoResetEvent(false);
+#if NET40
+            Task task = new Task((Action)(() =>
+            {
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = "cmd.exe ";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.CreateNoWindow = true;//是否显示DOS窗口，true代表隐藏;
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    if (isOutput)
+                        process.OutputDataReceived += (DataReceivedEventHandler)((sender, e) => Console.WriteLine(e.Data));
+                    process.ErrorDataReceived += (DataReceivedEventHandler)((sender, e) => Console.WriteLine(e.Data));
+                    process.EnableRaisingEvents = true;//配合事件委托使用
+                    process.Exited += (sender, e) =>
+                    {
+                        //Console.WriteLine("----------------------------------Valar Morghulis----------------------------------");
+                        auto.Set();
+                    };
+                    process.Start();
+                    using (StreamWriter standardInput = process.StandardInput)
+                    {
+                        standardInput.AutoFlush = true;
+                        process.BeginOutputReadLine();
+                        foreach (var command in commands)
+                        {
+                            standardInput.WriteLine(command);
+                        }
+                    }
+                    process.WaitForExit();
+                }
+            }), TaskCreationOptions.LongRunning);
+#endif
+
+#if NET45
+         Task task = new Task((async () =>
+            {
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = "cmd.exe ";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.CreateNoWindow = true;//是否显示DOS窗口，true代表隐藏;
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    if (isOutput)
+                        process.OutputDataReceived += (DataReceivedEventHandler)((sender, e) => Console.WriteLine(e.Data));
+                    process.ErrorDataReceived += (DataReceivedEventHandler)((sender, e) => Console.WriteLine(e.Data));
+                    process.EnableRaisingEvents = true;//配合事件委托使用
+                    process.Exited += (sender, e) =>
+                    {
+                        //Console.WriteLine("----------------------------------Valar Morghulis----------------------------------");
+                        auto.Set();
+                    };
+                    process.Start();
+                    using (StreamWriter standardInput = process.StandardInput)
+                    {
+                        standardInput.AutoFlush = true;
+                        process.BeginOutputReadLine();
+                        foreach (var command in commands)
+                        {
+                            await standardInput.WriteLineAsync(command);
+                        }
+
+                    }
+                    process.WaitForExit();
+                }
+            }), TaskCreationOptions.LongRunning);
+#endif
+            task.Start();
+            task.Wait();
+            //无限等待
+            auto.WaitOne();
+        }
+
 
         /// <summary>
         /// 执行多条命令
@@ -159,6 +243,7 @@ namespace FantasticCommonLibrary.ProcessWrapper
                         {
                             standardInput.AutoFlush = true;
                             process.BeginOutputReadLine();
+
                             await standardInput.WriteLineAsync(command);
                         }
                         process.WaitForExit();
